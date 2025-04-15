@@ -3,28 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UploadX — Link</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Your Link — UploadX</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .link-box {
+      background-color: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      word-wrap: break-word;
+    }
+    .btn {
+      margin-top: 30px;
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #25d366;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover {
+      background-color: #128c7e;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Upload Successful</h1>
-    <p>Here is your file link:</p>
-    <input type="text" id="linkBox" value="https://yourdomain.com/uploads/yourfile" readonly />
-    <button onclick="copyLink()" class="button">Copy Link</button>
 
-    <p style="margin-top: 30px;">Thanks for using UploadX!</p>
-    <p>Need help? Join our WhatsApp Support Group:</p>
-    <a class="button" href="https://chat.whatsapp.com/FtsIMqFSZIL7W1hspvSP13" target="_blank">Join Support Group</a>
-  </div>
+<h1>Thank you for using UploadX!</h1>
+<p>Here is your file link:</p>
+<div class="link-box" id="fileLink">Loading...</div>
 
-  <script>
-    function copyLink() {
-      const linkBox = document.getElementById("linkBox");
-      linkBox.select();
-      document.execCommand("copy");
-      alert("Link copied to clipboard!");
-    }
-  </script>
+<a href="https://chat.whatsapp.com/FtsIMqFSZIL7W1hspvSP13" class="btn" target="_blank">
+  Join our Support Group
+</a>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const file = params.get('file');
+  document.getElementById('fileLink').innerHTML = `<a href="${file}" target="_blank">${file}</a>`;
+</script>
+
 </body>
 </html>
