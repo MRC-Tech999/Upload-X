@@ -1,28 +1,36 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-
 const app = express();
-const PORT = 3000;
 
-// Serve static files
-app.use(express.static(__dirname));
-
-// Configure multer
+// Configuration de Multer pour stocker les fichiers
 const storage = multer.diskStorage({
-  destination: './uploads',
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName);
+  }
 });
 const upload = multer({ storage: storage });
 
+// Middleware
+app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
+
 // Upload route
 app.post('/upload', upload.single('file'), (req, res) => {
-  const fileUrl = `/uploads/${req.file.filename}`;
-  res.redirect(`/link.html?url=${fileUrl}`);
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  res.redirect(`/link.html?file=${encodeURIComponent(fileUrl)}`);
 });
 
-// Serve uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Start server
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+// Démarrage du serveur
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`UploadX Server running on http://localhost:${PORT}`);
+});
