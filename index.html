@@ -4,41 +4,48 @@
   <meta charset="UTF-8">
   <title>Uploader une Image</title>
   <style>
-    body { font-family: sans-serif; padding: 2em; }
-    button { padding: 0.5em 1em; font-size: 16px; }
-    #result { margin-top: 1em; word-break: break-all; }
+    body { font-family: sans-serif; padding: 2em; text-align: center; }
+    button { padding: 0.5em 1em; font-size: 16px; margin-top: 1em; }
+    #result { margin-top: 1em; word-break: break-word; }
+    img.logo { width: 120px; margin-bottom: 20px; }
   </style>
 </head>
 <body>
+  <img src="https://www.imghippo.com/i/yCN4505amw.jpeg" alt="Logo" class="logo" />
   <h1>Uploader une Image</h1>
+  <input type="file" id="imageInput" />
+  <br />
   <button onclick="uploadImage()">Uploader</button>
   <div id="result"></div>
 
   <script>
     async function uploadImage() {
+      const input = document.getElementById('imageInput');
+      const file = input.files[0];
       const resultDiv = document.getElementById('result');
       resultDiv.innerText = 'Chargement...';
 
-      const formData = new URLSearchParams();
-      formData.append('image', 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D');
-      formData.append('name', 'myimage.jpg');
+      if (!file) {
+        resultDiv.innerText = 'Veuillez sélectionner une image.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('name', file.name);
+      formData.append('api_key', 'ccbf1fdc90964be50bab4aea8426a0bf');
 
       try {
-        const response = await fetch('https://upload-images-hosting-get-url.p.rapidapi.com/upload', {
+        const response = await fetch('https://www.imghippo.com/api/v1/upload', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'x-rapidapi-host': 'upload-images-hosting-get-url.p.rapidapi.com',
-            'x-rapidapi-key': '2413118117msh97c68a8454ed446p157561jsn49d57d5fe542'
-          },
           body: formData
         });
 
         const data = await response.json();
-        if (data.url) {
-          resultDiv.innerHTML = `<strong>Image uploadée:</strong> <a href="${data.url}" target="_blank">${data.url}</a>`;
+        if (data.success && data.data && data.data.url) {
+          resultDiv.innerHTML = `<strong>Image uploadée :</strong> <a href="${data.data.url}" target="_blank">${data.data.url}</a><br><img src="${data.data.url}" alt="Image uploadée" style="max-width: 100%; margin-top: 10px;" />`;
         } else {
-          resultDiv.innerText = JSON.stringify(data, null, 2);
+          resultDiv.innerText = 'Erreur lors de l\'upload de l\'image.';
         }
       } catch (error) {
         resultDiv.innerText = 'Erreur : ' + error.message;
