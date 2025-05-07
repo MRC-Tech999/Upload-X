@@ -1,54 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UploadX — Free Media Uploader</title>
-  <style>
-    body {
-      background-color: #0d0d0d;
-      color: #f5f5f5;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      padding: 30px;
-    }
-    video {
-      max-width: 90%;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-    .btn {
-      margin-top: 30px;
-      padding: 15px 30px;
-      font-size: 18px;
-      background-color: #ff4444;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .btn:hover {
-      background-color: #cc0000;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Uploader une Image</title>
 </head>
 <body>
+  <h1>Uploader une image par URL</h1>
+  <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg" size="80">
+  <button onclick="sendImage()">Envoyer</button>
+  <pre id="response"></pre>
 
-<header>
-  <h1>Welcome to UploadX</h1>
-  <p>Upload your images or videos easily and get direct links to share!</p>
-  <video controls autoplay muted loop>
-    <source src="https://files.catbox.moe/kem6tj.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-  <br />
-  <a href="upload.html" class="btn">Continue</a>
-</header>
+  <script>
+    async function sendImage() {
+      const imageUrl = document.getElementById('imageUrl').value;
+      const responseBox = document.getElementById('response');
 
+      if (!imageUrl) {
+        responseBox.textContent = "Veuillez entrer une URL.";
+        return;
+      }
+
+      try {
+        const response = await fetch('upload.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageUrl })
+        });
+
+        const result = await response.json();
+        responseBox.textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        responseBox.textContent = "Erreur : " + err;
+      }
+    }
+  </script>
 </body>
 </html>
