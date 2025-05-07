@@ -2,31 +2,46 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Uploader une Image</title>
+  <title>Uploader une Image - Imghippo</title>
   <style>
-    body { font-family: sans-serif; padding: 2em; text-align: center; }
-    button { padding: 0.5em 1em; font-size: 16px; margin-top: 1em; }
-    #result { margin-top: 1em; word-break: break-word; }
-    img.logo { width: 120px; margin-bottom: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      margin-top: 1em;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 2em;
+      word-break: break-word;
+    }
   </style>
 </head>
 <body>
   <img src="https://www.imghippo.com/i/yCN4505amw.jpeg" alt="Logo" class="logo" />
   <h1>Uploader une Image</h1>
+
   <input type="file" id="imageInput" />
-  <br />
+  <br>
   <button onclick="uploadImage()">Uploader</button>
+
   <div id="result"></div>
 
   <script>
     async function uploadImage() {
-      const input = document.getElementById('imageInput');
-      const file = input.files[0];
+      const fileInput = document.getElementById('imageInput');
       const resultDiv = document.getElementById('result');
-      resultDiv.innerText = 'Chargement...';
+      const file = fileInput.files[0];
 
       if (!file) {
-        resultDiv.innerText = 'Veuillez sélectionner une image.';
+        resultDiv.innerText = "Veuillez sélectionner une image.";
         return;
       }
 
@@ -35,20 +50,31 @@
       formData.append('name', file.name);
       formData.append('api_key', 'ccbf1fdc90964be50bab4aea8426a0bf');
 
+      resultDiv.innerText = "Chargement...";
+
       try {
-        const response = await fetch('https://www.imghippo.com/api/v1/upload', {
-          method: 'POST',
+        const response = await fetch("https://www.imghippo.com/api/v1/upload", {
+          method: "POST",
           body: formData
         });
 
-        const data = await response.json();
-        if (data.success && data.data && data.data.url) {
-          resultDiv.innerHTML = `<strong>Image uploadée :</strong> <a href="${data.data.url}" target="_blank">${data.data.url}</a><br><img src="${data.data.url}" alt="Image uploadée" style="max-width: 100%; margin-top: 10px;" />`;
+        const result = await response.json();
+
+        if (result.success) {
+          const { title, url, view_url, extension, size, created_at } = result.data;
+
+          resultDiv.innerHTML = `
+            <h2>Image Uploadée</h2>
+            <img src="${url}" alt="Image uploadée" style="max-width: 100%; margin-bottom: 1em;" />
+            <p><strong>URL directe :</strong> <a href="${url}" target="_blank">${url}</a></p>
+            <p><strong>Fichier :</strong> ${title || file.name} (${extension}, ${(size/1024).toFixed(2)} KB)</p>
+            <p><strong>Créé le :</strong> ${new Date(created_at).toLocaleString()}</p>
+          `;
         } else {
-          resultDiv.innerText = 'Erreur lors de l\'upload de l\'image.';
+          resultDiv.innerText = "Erreur : " + result.message;
         }
       } catch (error) {
-        resultDiv.innerText = 'Erreur : ' + error.message;
+        resultDiv.innerText = "Erreur lors de l'upload : " + error.message;
       }
     }
   </script>
